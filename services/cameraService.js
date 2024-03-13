@@ -9,7 +9,6 @@ const CameraService = () => {
 
   const handleBarcodeScanned = ({ type, data }) => {
     if (!isScanningEnabled || !data) return;
-
     setIsScanningEnabled(false);
     // Add your barcode processing logic here
     Alert.alert("Barcode Scanned", `Type: ${type}, Data: ${data}`);

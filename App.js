@@ -9,7 +9,6 @@ import { NavigationProvider } from "./context/NavigationContext";
 export default function App() {
   return (
     <NavigationProvider>
-      {/* Make sure NavigationProvider wraps NavigationContainer */}
       <NavigationContainer>
         <Tabs />
       </NavigationContainer>

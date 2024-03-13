@@ -11,8 +11,7 @@ import {
 import { CameraView, useCameraPermissions } from "expo-camera/next";
 import { MaterialIcons } from "@expo/vector-icons";
 import WebView from "react-native-webview";
-import BrowserHeader from "../components/BrowserHeader";
-import { useNavigation } from "../context/NavigationContext"; // Adjust the path as necessary
+import BrowserHeader from "../components/BrowserHeader"; // Assuming BrowserHeader is the correct component
 
 const Scanner = () => {
   const [permission, requestPermission] = useCameraPermissions();
@@ -20,8 +19,6 @@ const Scanner = () => {
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const [webViewUrl, setWebViewUrl] = useState("https://www.google.com");
   const [isScanningEnabled, setIsScanningEnabled] = useState(true);
-  const { url, updateUrl } = useNavigation();
-  console.log(url, updateUrl);
 
   const handleBarcodeScanned = ({ type, data }) => {
     if (!isScanningEnabled || !data) return;
@@ -31,21 +28,22 @@ const Scanner = () => {
       data.length === 13 && data.startsWith("0") ? data.substring(1) : data;
     console.log("Scanned data is here:", newData);
 
-    if (newData.length < 12) {
-      Alert.alert("Invalid Item No", "Please enter the Item No in KeyPad");
-      setIsScanningEnabled(true);
-      return;
-    }
-
     const script = `
     (function() {
       var inputs = document.querySelectorAll("input[formControlName='search']");
       var newData = '${newData}';
       if(inputs.length > 0) {
-        var input = inputs[0]; // Assuming you want to target the first matching element
+        var input = inputs[0];
         input.value = newData;
         input.dispatchEvent(new Event('input', { bubbles: true }));     
         input.setAttribute('readonly', true);
+
+        // Clear the input after 3 seconds
+        setTimeout(function() {
+          input.value = "";
+          input.removeAttribute('readonly'); // Remove readonly attribute after clearing
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }, 2000);
       }
     })();
     true; 
@@ -56,16 +54,15 @@ const Scanner = () => {
 
   const handleNavigationStateChange = (navState) => {
     const url = navState.url;
-    setWebViewUrl(url);
-    updateUrl(url);
+    setWebViewUrl(url); // Update the URL bar with the current page's URL
     const isScannerPage = url.endsWith("/cart/scanner");
     setCameraEnabled(isScannerPage);
   };
 
   const onUrlSubmit = (url) => {
+    // Ensure the URL starts with 'http://' or 'https://'
     const formattedUrl = url.match(/^http[s]?:\/\//) ? url : `https://${url}`;
     setWebViewUrl(formattedUrl);
-    updateUrl(formattedUrl);
   };
 
   if (!permission?.granted) {
@@ -79,7 +76,10 @@ const Scanner = () => {
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
-      <BrowserHeader onUrlSubmit={onUrlSubmit} inputValue={webViewUrl} />
+      <BrowserHeader
+        onUrlSubmit={onUrlSubmit} // Update WebView URL when the user submits a new URL
+        inputValue={webViewUrl} // Pass the current URL to display in the URL bar
+      />
       <View style={styles.container}>
         {cameraEnabled && (
           <CameraView

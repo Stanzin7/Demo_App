@@ -26,7 +26,7 @@ const BrowserHeader = ({ onUrlSubmit }) => {
         style={styles.input}
         onChangeText={setInputValue}
         value={inputValue}
-        placeholder="Search or type web address"
+        placeholder="Search Google or type a URL"
         placeholderTextColor="#8E8E93"
         keyboardType="web-search"
         returnKeyType="go"
