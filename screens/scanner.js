@@ -6,55 +6,67 @@ import {
   Button,
   SafeAreaView,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera/next";
+import { MaterialIcons } from "@expo/vector-icons";
 import WebView from "react-native-webview";
+import BrowserHeader from "../components/BrowserHeader";
+import { useNavigation } from "../context/NavigationContext"; // Adjust the path as necessary
 
 const Scanner = () => {
   const [permission, requestPermission] = useCameraPermissions();
-  const [adjustedData, setAdjustedData] = useState("");
   const webViewRef = useRef(null);
   const [cameraEnabled, setCameraEnabled] = useState(false);
+  const [webViewUrl, setWebViewUrl] = useState("https://www.google.com");
+  const [isScanningEnabled, setIsScanningEnabled] = useState(true);
+  const { url, updateUrl } = useNavigation();
+  console.log(url, updateUrl);
 
   const handleBarcodeScanned = ({ type, data }) => {
-    const newData =
+    if (!isScanningEnabled || !data) return;
+
+    setIsScanningEnabled(false);
+    let newData =
       data.length === 13 && data.startsWith("0") ? data.substring(1) : data;
-    setAdjustedData(newData);
     console.log("Scanned data is here:", newData);
 
     if (newData.length < 12) {
-      Alert.alert("Please enter the Item No in KeyPad");
+      Alert.alert("Invalid Item No", "Please enter the Item No in KeyPad");
+      setIsScanningEnabled(true);
       return;
     }
 
-    // Inject JavaScript to fill in the scanned data into the web page
     const script = `
     (function() {
-      const inputs = ['mat-input-1', 'mat-input-2', 'mat-input-3', 'mat-input-4'];
-      const data = '${newData}';
-      for (let i = 0; i < inputs.length; i++) {
-        const input = document.getElementById(inputs[i]);
-        if (input) {
-          input.value = data;
-          input.dispatchEvent(new Event('input', { bubbles: true }));
-          input.setAttribute('readonly', true); 
-          break; 
-        }
+      var inputs = document.querySelectorAll("input[formControlName='search']");
+      var newData = '${newData}';
+      if(inputs.length > 0) {
+        var input = inputs[0]; // Assuming you want to target the first matching element
+        input.value = newData;
+        input.dispatchEvent(new Event('input', { bubbles: true }));     
+        input.setAttribute('readonly', true);
       }
     })();
     true; 
   `;
-    webViewRef.current.injectJavaScript(script);
+    webViewRef.current?.injectJavaScript(script);
+    setTimeout(() => setIsScanningEnabled(true), 3000);
   };
 
-  const clearInputScript = `
-    document.querySelector('form').addEventListener('submit', function() {
-      setTimeout(function() {
-        document.getElementById('mat-input-1').value = '';
-      }, 500); 
-    });
-    true;
-  `;
+  const handleNavigationStateChange = (navState) => {
+    const url = navState.url;
+    setWebViewUrl(url);
+    updateUrl(url);
+    const isScannerPage = url.endsWith("/cart/scanner");
+    setCameraEnabled(isScannerPage);
+  };
+
+  const onUrlSubmit = (url) => {
+    const formattedUrl = url.match(/^http[s]?:\/\//) ? url : `https://${url}`;
+    setWebViewUrl(formattedUrl);
+    updateUrl(formattedUrl);
+  };
 
   if (!permission?.granted) {
     return (
@@ -64,19 +76,10 @@ const Scanner = () => {
       </View>
     );
   }
-  const handleNavigationStateChange = (navState) => {
-    // Check if the current URL ends with '/cart/scanner'
-    const url = navState.url;
-    const isScannerPage = url.endsWith("/cart/scanner");
-    setCameraEnabled(isScannerPage); // Enable camera if on scanner page
-  };
-
-  const handleScanAgainPress = () => {
-    setAdjustedData("");
-  };
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
+      <BrowserHeader onUrlSubmit={onUrlSubmit} inputValue={webViewUrl} />
       <View style={styles.container}>
         {cameraEnabled && (
           <CameraView
@@ -92,19 +95,22 @@ const Scanner = () => {
       <WebView
         ref={webViewRef}
         style={styles.webview}
-        source={{ uri: "https://google.com" }}
+        source={{ uri: webViewUrl }}
         javaScriptEnabled={true}
-        injectedJavaScript={clearInputScript}
-        onNavigationStateChange={handleNavigationStateChange} // Track URL changes
+        onNavigationStateChange={handleNavigationStateChange}
       />
-
-      {/* <View style={styles.buttonContainer}>
-        <Button
-          color={"black"}
-          title="Scan Again"
-          onPress={handleScanAgainPress}
-        />
-      </View> */}
+      <TouchableOpacity
+        onPress={() => webViewRef.current?.goBack()}
+        style={[styles.fab, styles.leftFab]}
+      >
+        <MaterialIcons name="arrow-back" size={24} color="white" />
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => webViewRef.current?.goForward()}
+        style={[styles.fab, styles.rightFab]}
+      >
+        <MaterialIcons name="arrow-forward" size={24} color="white" />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -140,6 +146,27 @@ const styles = StyleSheet.create({
     bottom: 10,
     alignSelf: "center",
     borderRadius: 5,
+  },
+  fab: {
+    position: "absolute",
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#007AFF",
+    bottom: 20,
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    shadowColor: "#000000",
+    shadowOffset: { height: 3, width: 0 },
+    elevation: 6, // for Android shadow
+  },
+  leftFab: {
+    left: 20,
+  },
+  rightFab: {
+    right: 20,
   },
 });
 

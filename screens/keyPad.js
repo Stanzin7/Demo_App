@@ -1,30 +1,18 @@
-import React, { useState } from "react";
-import { View, TextInput, StyleSheet } from "react-native";
+import React from "react";
+import { View, StyleSheet } from "react-native";
 import Colors from "../constants/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
 import WebView from "react-native-webview";
+import { useNavigation } from "../context/NavigationContext";
 
 const KeyPad = () => {
-  const [upc, setUPC] = useState("");
+  const { url } = useNavigation();
+  console.log("Keypad", url);
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
-      <View style={styles.inputContainer}>
-        {/* <TextInput
-          style={styles.input}
-          placeholder="Enter UPC"
-          placeholderTextColor={Colors.dark}
-          keyboardType="numeric"
-          returnKeyType="done"
-          onChangeText={setUPC}
-          value={upc}
-          autoFocus={true}
-        /> */}
-      </View>
-      <WebView
-        style={styles.webview}
-        source={{ uri: "https://www.socksgalorews.com/cart/scanner" }}
-      />
+      <View style={styles.inputContainer}></View>
+      <WebView style={styles.webview} source={{ uri: url }} />
     </SafeAreaView>
   );
 };
@@ -32,7 +20,7 @@ const KeyPad = () => {
 const styles = StyleSheet.create({
   safeAreaContainer: {
     flex: 1,
-    backgroundColor: "black", // Using a background color for safe area
+    backgroundColor: "black",
     marginTop: -100,
     marginBottom: -40,
   },
@@ -40,21 +28,11 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: "white", // Background color for the input container
-  },
-  input: {
-    height: 50,
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "gray",
-    padding: 10,
-    fontSize: 20,
-    borderRadius: 5,
-    color: Colors.dark,
+    backgroundColor: "white",
   },
   webview: {
-    flex: 1, // Take up all remaining space
-    backgroundColor: Colors.light, // Same background color as the safe area
+    flex: 1,
+    backgroundColor: Colors.light,
   },
 });
 

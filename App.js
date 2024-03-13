@@ -4,16 +4,16 @@ import { StyleSheet } from "react-native";
 import Constants from "expo-constants";
 import Tabs from "./navigation/Tabs";
 import { NavigationContainer } from "@react-navigation/native";
+import { NavigationProvider } from "./context/NavigationContext";
 
 export default function App() {
   return (
-    // <WebView
-    //   style={styles.container}
-    //   source={{ uri: "https://www.socksgalorews.com/cart/scanner" }}
-    // />
-    <NavigationContainer>
-      <Tabs />
-    </NavigationContainer>
+    <NavigationProvider>
+      {/* Make sure NavigationProvider wraps NavigationContainer */}
+      <NavigationContainer>
+        <Tabs />
+      </NavigationContainer>
+    </NavigationProvider>
   );
 }
 
