@@ -3,10 +3,10 @@ import { View, StyleSheet } from "react-native";
 import Colors from "../constants/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
 import WebView from "react-native-webview";
-import { useNavigation } from "../context/NavigationContext";
+import { useNavigationContext } from "../context/NavigationContext"; // Adjusted import to useNavigationContext
 
 const KeyPad = () => {
-  const { url } = useNavigation();
+  const { url } = useNavigationContext(); // Use the corrected hook
   console.log("Keypad", url);
 
   return (
@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   safeAreaContainer: {
     flex: 1,
     backgroundColor: "black",
-    marginTop: -100,
+    marginTop: -94,
     marginBottom: -40,
   },
   inputContainer: {

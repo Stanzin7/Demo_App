@@ -2,10 +2,10 @@ import React, { createContext, useContext, useState } from "react";
 
 const NavigationContext = createContext();
 
-export const useNavigation = () => useContext(NavigationContext);
+export const useNavigationContext = () => useContext(NavigationContext);
 
 export const NavigationProvider = ({ children }) => {
-  const [url, setUrl] = useState("https://www.google.com");
+  const [url, setUrl] = useState("");
 
   const updateUrl = (newUrl) => {
     setUrl(newUrl);

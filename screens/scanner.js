@@ -1,61 +1,54 @@
-import React, { useState, useRef } from "react";
-import {
-  SafeAreaView,
-  StyleSheet,
-  Alert,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import { SafeAreaView, StyleSheet, TouchableOpacity } from "react-native";
 import BarcodeScanner from "../components/BarcodeScanner";
 import BrowserHeader from "../components/BrowserHeader";
-import { useNavigation } from "../context/NavigationContext"; // Adjust the path as necessary
+import { useNavigationContext } from "../context/NavigationContext"; // Adjust the path as necessary
 import WebView from "react-native-webview";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const Scanner = () => {
   const webViewRef = useRef(null);
-  const [webViewUrl, setWebViewUrl] = useState("https://google.com");
+  const { url, updateUrl } = useNavigationContext(); // Use the global URL from the NavigationContext
   const [cameraEnabled, setCameraEnabled] = useState(false);
-  const { updateUrl } = useNavigation();
+
+  useEffect(() => {
+    // This effect ensures the WebView loads the current global URL on mount and when it changes
+    webViewRef.current?.reload();
+  }, [url]);
 
   const handleScanData = (data) => {
-    let newData =
-      data.length === 13 && data.startsWith("0") ? data.substring(1) : data;
-    console.log("Scanned data is here:", newData);
+    let newData = data.startsWith("0") ? data.substring(1) : data;
 
-    // Inject JavaScript into the WebView to fill the search input with scanned data
     const script = `
-      (function() {
-        var inputs = document.querySelectorAll("input[formControlName='search']");
-        var newData = '${newData}';
-        if(inputs.length > 0) {
-          var input = inputs[0];
-          input.value = newData;
-          input.dispatchEvent(new Event('input', { bubbles: true }));     
-          input.setAttribute('readonly', true);
-        }
-      })();
-      true; 
-    `;
+    (function() {
+      var inputs = document.querySelectorAll("input[formControlName='search']");
+      var newData = '${newData}';
+      if(inputs.length > 0) {
+        var input = inputs[0];
+        input.value = newData;
+        input.dispatchEvent(new Event('input', { bubbles: true }));     
+        input.setAttribute('readonly', true);
+      }
+    })();
+    true; 
+  `;
     webViewRef.current?.injectJavaScript(script);
   };
 
   const handleNavigationStateChange = (navState) => {
     const newUrl = navState.url;
-    setWebViewUrl(newUrl);
-    updateUrl(newUrl); // If using a navigation context to track URL changes
+    updateUrl(newUrl); // Update the global URL based on the WebView navigation
     const isScannerPage = newUrl.includes("/cart/scanner");
     setCameraEnabled(isScannerPage);
   };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <BrowserHeader onUrlSubmit={setWebViewUrl} inputValue={webViewUrl} />
       {cameraEnabled && <BarcodeScanner onScan={handleScanData} />}
       <WebView
         ref={webViewRef}
+        source={{ uri: url }} // Use the global URL
         style={{ flex: 1 }}
-        source={{ uri: webViewUrl }}
         javaScriptEnabled={true}
         onNavigationStateChange={handleNavigationStateChange}
       />

@@ -12,7 +12,7 @@ export default function Tabs() {
   return (
     <Tab.Navigator>
       <Tab.Screen
-        name="IMX-SCANNER"
+        name="SCANNER"
         component={Scanner}
         options={{
           tabBarLabel: "Scan",
@@ -30,7 +30,7 @@ export default function Tabs() {
           headerTitleStyle: {
             fontWeight: "bold",
           },
-          headerTitle: "IMX Scanner",
+          headerTitle: "Scanner",
         }}
       />
       <Tab.Screen
@@ -48,7 +48,7 @@ export default function Tabs() {
           headerTitleStyle: {
             fontWeight: "bold",
           },
-          headerTitle: "IMX Scanner",
+          headerTitle: "Scanner",
         }}
       />
     </Tab.Navigator>
