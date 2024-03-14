@@ -11,10 +11,10 @@ const Scanner = () => {
   const { url, updateUrl } = useNavigationContext(); // Use the global URL from the NavigationContext
   const [cameraEnabled, setCameraEnabled] = useState(false);
 
-  useEffect(() => {
-    // This effect ensures the WebView loads the current global URL on mount and when it changes
-    webViewRef.current?.reload();
-  }, [url]);
+  // useEffect(() => {
+  //   // This effect ensures the WebView loads the current global URL on mount and when it changes
+  //   webViewRef.current?.reload();
+  // }, [url]);
 
   const handleScanData = (data) => {
     let newData = data.startsWith("0") ? data.substring(1) : data;
@@ -41,9 +41,11 @@ const Scanner = () => {
     const isScannerPage = newUrl.includes("/cart/scanner");
     setCameraEnabled(isScannerPage);
   };
+  const isHomepage = url.endsWith("/home");
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      {isHomepage && <BrowserHeader onUrlSubmit={updateUrl} currentUrl={url} />}
       {cameraEnabled && <BarcodeScanner onScan={handleScanData} />}
       <WebView
         ref={webViewRef}

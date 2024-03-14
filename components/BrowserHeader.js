@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -8,14 +8,28 @@ import {
 } from "react-native";
 import { EvilIcons } from "@expo/vector-icons";
 
-const BrowserHeader = ({ onUrlSubmit }) => {
-  const [inputValue, setInputValue] = useState("");
+const BrowserHeader = ({ onUrlSubmit, currentUrl }) => {
+  const [inputValue, setInputValue] = useState(currentUrl);
+
+  useEffect(() => {
+    setInputValue(currentUrl);
+  }, []);
 
   const handleSubmitEditing = () => {
     if (inputValue) {
-      const formattedInputValue = inputValue.match(/^http[s]?:\/\//)
+      // Check if the URL starts with 'http://' or 'https://', if not, prepend 'https://'
+      let formattedInputValue = /^(http|https):\/\//.test(inputValue)
         ? inputValue
         : `https://${inputValue}`;
+
+      // Normalize the URL to ensure it always goes to the homepage by checking if a path is present
+      const urlObject = new URL(formattedInputValue);
+      if (urlObject.pathname === "/") {
+        // If there is no path, set it to '/home'
+        urlObject.pathname = "/home";
+        formattedInputValue = urlObject.toString();
+      }
+
       onUrlSubmit(formattedInputValue);
     }
   };
