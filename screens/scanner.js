@@ -7,8 +7,8 @@ import WebView from "react-native-webview";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const Scanner = () => {
-  const webViewRef = useRef(null);
-  const { url, updateUrl } = useNavigationContext(); // Use the global URL from the NavigationContext
+  // const webViewRef = useRef(null);
+  const { url, updateUrl, webViewRef } = useNavigationContext(); // Use the global URL from the NavigationContext
   const [cameraEnabled, setCameraEnabled] = useState(false);
 
   // useEffect(() => {
@@ -37,9 +37,12 @@ const Scanner = () => {
 
   const handleNavigationStateChange = (navState) => {
     const newUrl = navState.url;
-    updateUrl(newUrl); // Update the global URL based on the WebView navigation
-    const isScannerPage = newUrl.includes("/cart/scanner");
-    setCameraEnabled(isScannerPage);
+    // Only update the URL if it has actually changed
+    if (url !== newUrl) {
+      updateUrl(newUrl);
+      const isScannerPage = newUrl.includes("/cart/scanner");
+      setCameraEnabled(isScannerPage);
+    }
   };
   const isHomepage = url.endsWith("/home");
 
@@ -54,7 +57,7 @@ const Scanner = () => {
         javaScriptEnabled={true}
         onNavigationStateChange={handleNavigationStateChange}
       />
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => webViewRef.current?.goBack()}
         style={[styles.fab, styles.leftFab]}
       >
@@ -65,7 +68,7 @@ const Scanner = () => {
         style={[styles.fab, styles.rightFab]}
       >
         <MaterialIcons name="arrow-forward" size={24} color="white" />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </SafeAreaView>
   );
 };

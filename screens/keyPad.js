@@ -4,13 +4,16 @@ import Colors from "../constants/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
 import WebView from "react-native-webview";
 import { useNavigationContext } from "../context/NavigationContext"; // Adjusted import to useNavigationContext
+import BrowserHeader from "../components/BrowserHeader";
 
 const KeyPad = () => {
-  const { url } = useNavigationContext(); // Use the corrected hook
+  const { url, updateUrl, webViewRef } = useNavigationContext();
+  const isHomepage = url.endsWith("/home");
   console.log("Keypad", url);
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
+      {isHomepage && <BrowserHeader onUrlSubmit={updateUrl} currentUrl={url} />}
       <View style={styles.inputContainer}></View>
       <WebView style={styles.webview} source={{ uri: url }} />
     </SafeAreaView>

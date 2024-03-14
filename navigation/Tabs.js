@@ -1,14 +1,19 @@
+import React from "react";
+import { TouchableOpacity } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Scanner from "../screens/scanner";
 import KeyPad from "../screens/keyPad";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { Ionicons } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { MaterialIcons, Entypo } from "@expo/vector-icons";
+import {
+  MaterialCommunityIcons,
+  Ionicons,
+  MaterialIcons,
+} from "@expo/vector-icons";
+import { useNavigationContext } from "../context/NavigationContext";
 
 const Tab = createBottomTabNavigator();
 
 export default function Tabs() {
+  const { goBack, goForward } = useNavigationContext();
   return (
     <Tab.Navigator>
       <Tab.Screen
@@ -31,6 +36,16 @@ export default function Tabs() {
             fontWeight: "bold",
           },
           headerTitle: "Scanner",
+          headerLeft: () => (
+            <TouchableOpacity onPress={goBack}>
+              <MaterialIcons name="arrow-back" size={24} color="white" />
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <TouchableOpacity onPress={goForward}>
+              <MaterialIcons name="arrow-forward" size={24} color="white" />
+            </TouchableOpacity>
+          ),
         }}
       />
       <Tab.Screen
@@ -48,7 +63,17 @@ export default function Tabs() {
           headerTitleStyle: {
             fontWeight: "bold",
           },
-          headerTitle: "Scanner",
+          headerTitle: "KeyPad", // Fixed to match the KeyPad screen title
+          headerLeft: () => (
+            <TouchableOpacity onPress={goBack}>
+              <MaterialIcons name="arrow-back" size={24} color="white" />
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <TouchableOpacity onPress={goForward}>
+              <MaterialIcons name="arrow-forward" size={24} color="white" />
+            </TouchableOpacity>
+          ),
         }}
       />
     </Tab.Navigator>
