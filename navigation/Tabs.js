@@ -3,6 +3,7 @@ import { TouchableOpacity } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Scanner from "../screens/scanner";
 import KeyPad from "../screens/keyPad";
+import continousScan from "../screens/continousScan";
 import {
   MaterialCommunityIcons,
   Ionicons,
@@ -21,6 +22,38 @@ export default function Tabs() {
         component={Scanner}
         options={{
           tabBarLabel: "Scan",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="barcode-scan"
+              size={size}
+              color={color}
+            />
+          ),
+          headerStyle: {
+            backgroundColor: "#007AFF",
+          },
+          headerTintColor: "#fff",
+          headerTitleStyle: {
+            fontWeight: "bold",
+          },
+          headerTitle: "Scanner",
+          headerLeft: () => (
+            <TouchableOpacity onPress={goBack}>
+              <MaterialIcons name="arrow-back" size={24} color="white" />
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <TouchableOpacity onPress={goForward}>
+              <MaterialIcons name="arrow-forward" size={24} color="white" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="CONTINOUS_SCANNER"
+        component={continousScan}
+        options={{
+          tabBarLabel: "Continous Scan",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="barcode-scan"

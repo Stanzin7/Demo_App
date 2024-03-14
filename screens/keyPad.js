@@ -19,23 +19,25 @@ const KeyPad = () => {
     </SafeAreaView>
   );
 };
-
 const styles = StyleSheet.create({
   safeAreaContainer: {
     flex: 1,
     backgroundColor: "black",
-    marginTop: -94,
-    marginBottom: -40,
+    paddingBottom: 20,
+    marginTop: -60,
+    marginBottom: -60,
   },
+
   inputContainer: {
     paddingTop: 20,
     paddingHorizontal: 20,
     paddingVertical: 15,
     backgroundColor: "white",
+    marginBottom: -35,
   },
+  // Ensure the WebView fills the space without unnecessary coloring, unless it's for loading state.
   webview: {
     flex: 1,
-    backgroundColor: Colors.light,
   },
 });
 
