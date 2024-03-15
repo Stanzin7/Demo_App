@@ -4,10 +4,9 @@ import { useCameraPermissions } from "expo-camera/next";
 
 const CameraService = () => {
   const [permission, requestPermission] = useCameraPermissions();
-  const [isScanningEnabled, setIsScanningEnabled] = useState(false); // Initially set to false, enable after permissions are granted
+  const [isScanningEnabled, setIsScanningEnabled] = useState(false);
 
   useEffect(() => {
-    // Automatically request permissions when the hook is used
     (async () => {
       const { status } = await requestPermission();
       if (status === "granted") {
@@ -21,7 +20,6 @@ const CameraService = () => {
     })();
   }, [requestPermission]);
 
-  // This function should be called when a barcode is scanned.
   const handleBarcodeScanned = ({ type, data }) => {
     if (!isScanningEnabled || !data) return;
     setIsScanningEnabled(false);
@@ -35,9 +33,6 @@ const CameraService = () => {
     // Cleanup function in useEffect hook
     return () => clearTimeout(timer);
   };
-
-  // If there's any other state or side effects you want to clean up,
-  // it should be managed in a separate useEffect hook.
 
   return {
     permission,
