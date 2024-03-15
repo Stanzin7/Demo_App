@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Alert } from "react-native";
 import { useCameraPermissions } from "expo-camera/next";
 
@@ -21,20 +21,23 @@ const CameraService = () => {
     })();
   }, [requestPermission]);
 
-  const handleBarcodeScanned = useCallback(
-    ({ type, data }) => {
-      if (!isScanningEnabled || !data) return;
-      setIsScanningEnabled(false);
-      Alert.alert("Barcode Scanned", `Type: ${type}, Data: ${data}`);
+  // This function should be called when a barcode is scanned.
+  const handleBarcodeScanned = ({ type, data }) => {
+    if (!isScanningEnabled || !data) return;
+    setIsScanningEnabled(false);
+    Alert.alert("Barcode Scanned", `Type: ${type}, Data: ${data}`);
 
-      // Re-enable scanning after 3 seconds, ensure cleanup if the component unmounts
-      const timer = setTimeout(() => setIsScanningEnabled(true), 3000);
+    // Re-enable scanning after 3 seconds
+    const timer = setTimeout(() => {
+      setIsScanningEnabled(true);
+    }, 3000);
 
-      // Cleanup function
-      return () => clearTimeout(timer);
-    },
-    [isScanningEnabled]
-  );
+    // Cleanup function in useEffect hook
+    return () => clearTimeout(timer);
+  };
+
+  // If there's any other state or side effects you want to clean up,
+  // it should be managed in a separate useEffect hook.
 
   return {
     permission,

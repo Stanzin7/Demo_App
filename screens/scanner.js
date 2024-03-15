@@ -1,59 +1,53 @@
-import React, { useState, useRef } from "react";
+import React from "react";
 import { SafeAreaView, StyleSheet, Alert } from "react-native";
-import BarcodeScanner from "../components/BarcodeScanner"; // Adjust path as necessary
+import BarcodeScanner from "../components/BarcodeScanner"; // Adjust this path as necessary
 import WebView from "react-native-webview";
-import { useNavigationContext } from "../context/NavigationContext"; // Adjust the path as necessary
+import { useNavigationContext } from "../context/NavigationContext";
 import BrowserHeader from "../components/BrowserHeader";
 
 const Scanner = () => {
-  const webViewRef = useRef(null);
-  const { url, updateUrl } = useNavigationContext();
-  const [cameraEnabled, setCameraEnabled] = useState(false);
+  const { url, updateUrl, cameraEnabled, webViewRef } = useNavigationContext();
 
   const handleScanData = (data) => {
     let newData = data.startsWith("0") ? data.substring(1) : data;
     const script = `
-      (function() {
-        var inputs = document.querySelectorAll("input[formControlName='search']");
-        var newData = '${newData}';
-        if(inputs.length > 0) {
-          var input = inputs[0];
-          input.value = newData;
-          input.dispatchEvent(new Event('input', { bubbles: true }));
-          input.setAttribute('readonly', true);
+    (function() {
+      var input = document.querySelector("input[formControlName='search']");
+      if (input) {
+        input.value = '${newData}';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        var form = input.closest('form');
+        if (form) {
+          form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
         }
-      })();
-      true;
-    `;
+        input.blur(); // This line is added to blur the input field and prevent the keyboard from showing
+      }
+    })();
+    true;
+  `;
     webViewRef.current?.injectJavaScript(script);
   };
 
+  // Monitor the navigation state to update the URL accordingly
   const handleNavigationStateChange = (navState) => {
-    const newUrl = navState.url;
-    if (url !== newUrl) {
-      updateUrl(newUrl);
-      const isScannerPage = newUrl.includes("/cart/scanner");
-      setCameraEnabled(isScannerPage);
+    if (url !== navState.url) {
+      updateUrl(navState.url);
     }
   };
 
-  const handleWebViewError = (syntheticEvent) => {
-    const { nativeEvent } = syntheticEvent;
-    Alert.alert("WebView error", nativeEvent.description);
-  };
-  const isHomepage = url.endsWith("/home") || url.endsWith("/");
-
   return (
     <SafeAreaView style={styles.container}>
-      {isHomepage && <BrowserHeader onUrlSubmit={updateUrl} currentUrl={url} />}
+      <BrowserHeader onUrlSubmit={updateUrl} currentUrl={url} />
       {cameraEnabled && <BarcodeScanner onScan={handleScanData} />}
       <WebView
         ref={webViewRef}
         source={{ uri: url }}
         style={styles.webView}
-        javaScriptEnabled={true}
         onNavigationStateChange={handleNavigationStateChange}
-        onError={handleWebViewError}
+        onError={(syntheticEvent) => {
+          const { nativeEvent } = syntheticEvent;
+          Alert.alert("WebView error", nativeEvent.description);
+        }}
       />
     </SafeAreaView>
   );

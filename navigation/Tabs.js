@@ -1,66 +1,33 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { TouchableOpacity } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Scanner from "../screens/scanner";
 import KeyPad from "../screens/keyPad";
-import ContinuousScan from "../screens/continousScan";
 import {
   MaterialCommunityIcons,
   Ionicons,
   MaterialIcons,
 } from "@expo/vector-icons";
 import { useNavigationContext } from "../context/NavigationContext";
-import { useNavigation } from "@react-navigation/native";
 
 const Tab = createBottomTabNavigator();
 
 const Tabs = () => {
-  const { url, setCameraEnabled, goBack, goForward } = useNavigationContext();
-  const navigation = useNavigation();
+  const { goBack, goForward } = useNavigationContext();
 
-  useEffect(() => {
-    const isScannerPage = url.includes("/cart/scanner");
-    setCameraEnabled(isScannerPage);
-  }, [url, setCameraEnabled]);
-
-  const screenOptions = {
+  // Define default screen options here if needed
+  const defaultScreenOptions = {
     headerStyle: { backgroundColor: "#007AFF" },
     headerTintColor: "#fff",
     headerTitleStyle: { fontWeight: "bold" },
-    headerLeft: () => (
-      <TouchableOpacity
-        onPress={() => {
-          if (webViewRef.current && webViewRef.current.canGoBack()) {
-            webViewRef.current.goBack();
-          } else {
-            console.log("No back history available in WebView");
-          }
-        }}
-      >
-        <MaterialIcons name="arrow-back" size={24} color="white" />
-      </TouchableOpacity>
-    ),
-    headerRight: () => (
-      <TouchableOpacity
-        onPress={() => {
-          if (webViewRef.current && webViewRef.current.canGoForward()) {
-            webViewRef.current.goForward();
-          } else {
-            console.log("No forward history available in WebView");
-          }
-        }}
-      >
-        <MaterialIcons name="arrow-forward" size={24} color="white" />
-      </TouchableOpacity>
-    ),
   };
+
   return (
-    <Tab.Navigator screenOptions={{ headerShown: true }}>
+    <Tab.Navigator screenOptions={defaultScreenOptions}>
       <Tab.Screen
         name="SCANNER"
         component={Scanner}
         options={{
-          ...screenOptions,
           tabBarLabel: "Scan",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
@@ -69,32 +36,15 @@ const Tabs = () => {
               size={size}
             />
           ),
-          tabBarButton: (props) => (
-            <TouchableOpacity
-              {...props}
-              onPress={() => {
-                // Directly enable scanner without toggling
-                if (!url.includes("/cart/scanner")) {
-                  navigation.navigate("SCANNER");
-                }
-                setCameraEnabled(true);
-              }}
-            />
+          headerLeft: () => (
+            <TouchableOpacity onPress={goBack}>
+              <MaterialIcons name="arrow-back" size={24} color="white" />
+            </TouchableOpacity>
           ),
-        }}
-      />
-      <Tab.Screen
-        name="CONTINUOUS_SCANNER"
-        component={ContinuousScan}
-        options={{
-          ...screenOptions,
-          tabBarLabel: "Continuous Scan",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="barcode-scan"
-              color={color}
-              size={size}
-            />
+          headerRight: () => (
+            <TouchableOpacity onPress={goForward}>
+              <MaterialIcons name="arrow-forward" size={24} color="white" />
+            </TouchableOpacity>
           ),
         }}
       />
@@ -102,10 +52,19 @@ const Tabs = () => {
         name="KeyPad"
         component={KeyPad}
         options={{
-          ...screenOptions,
           tabBarLabel: "KeyPad",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="keypad" color={color} size={size} />
+          ),
+          headerLeft: () => (
+            <TouchableOpacity onPress={goBack}>
+              <MaterialIcons name="arrow-back" size={24} color="white" />
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <TouchableOpacity onPress={goForward}>
+              <MaterialIcons name="arrow-forward" size={24} color="white" />
+            </TouchableOpacity>
           ),
         }}
       />

@@ -1,117 +1,120 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Platform, Alert } from "react-native";
-import { SafeAreaView, StyleSheet, TouchableOpacity } from "react-native";
-import BarcodeScanner from "../components/BarcodeScanner";
-import BrowserHeader from "../components/BrowserHeader";
-import { useNavigationContext } from "../context/NavigationContext"; // Adjust the path as necessary
-import WebView from "react-native-webview";
-import { MaterialIcons } from "@expo/vector-icons";
+// import React, { useState, useRef, useEffect } from "react";
+// import { SafeAreaView, StyleSheet, Alert, View, Text } from "react-native";
+// import BarcodeScanner from "../components/BarcodeScanner";
+// import WebView from "react-native-webview";
+// import { useNavigationContext } from "../context/NavigationContext";
+// import BrowserHeader from "../components/BrowserHeader";
 
-const Scanner = () => {
-  // const webViewRef = useRef(null);
-  const webViewRef = useRef(null);
-  const { url, updateUrl } = useNavigationContext(); // Use the global URL from the NavigationContext
-  const [cameraEnabled, setCameraEnabled] = useState(false);
+// const ContinuousScanner = () => {
+//   const webViewRef = useRef(null);
+//   const { url, updateUrl, cameraEnabled, setCameraEnabled } =
+//     useNavigationContext();
+//   const [isContinuousScanning, setIsContinuousScanning] = useState(false);
 
-  // useEffect(() => {
-  //   // This effect ensures the WebView loads the current global URL on mount and when it changes
-  //   webViewRef.current?.reload();
-  // }, [url]);
+//   useEffect(() => {
+//     // Enable camera and start continuous scanning when the component mounts
+//     setCameraEnabled(true);
+//     setIsContinuousScanning(true);
 
-  const handleScanData = (data) => {
-    let newData = data.startsWith("0") ? data.substring(1) : data;
+//     // Cleanup function to disable camera and scanning when the component unmounts
+//     return () => {
+//       setCameraEnabled(false);
+//       setIsContinuousScanning(false);
+//     };
+//   }, [setCameraEnabled]);
 
-    const script = `
-    (function() {
-      var input = document.querySelector("input[formControlName='search']");
-      if (input) {
-        // Set the value of the input
-        input.value = '${newData}';
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        
-        // Attempt to trigger the form submission
-        var form = input.closest('form');
-        if (form) {
-          form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-          // Blur the input field to hide the keyboard
-          input.blur();
-          return true;
-        }
-      }
-      return false;
-    })();
-    true;
-  `;
+//   const handleScanData = (data) => {
+//     if (isContinuousScanning) {
+//       // Process scanning data and perform continuous scans here
+//       let newData = data.startsWith("0") ? data.substring(1) : data;
+//       const script = `
+//         (function() {
+//           var input = document.querySelector("input[formControlName='search']");
+//           if (input) {
+//             input.value = '${newData}';
+//             input.dispatchEvent(new Event('input', { bubbles: true }));
 
-    webViewRef.current?.injectJavaScript(script);
-  };
+//             // Submit the form to complete the scan
+//             var form = input.closest('form');
+//             if (form) {
+//               form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+//             }
+//             // For continuous scanning, don't blur the input
+//             // input.blur(); // Comment this line to keep focus for continuous scanning
+//           }
+//         })();
+//         true;
+//       `;
 
-  const handleNavigationStateChange = (navState) => {
-    const newUrl = navState.url;
-    // Only update the URL if it has actually changed
-    if (url !== newUrl) {
-      updateUrl(newUrl);
-      const isScannerPage = newUrl.includes("/cart/scanner");
-      setCameraEnabled(isScannerPage);
-    }
-  };
-  // Handle WebView load errors
-  const handleWebViewError = (error) => {
-    Alert.alert(
-      "Load Error",
-      "Failed to load the page. Please check the URL or your network connection."
-    );
-  };
+//       webViewRef.current?.injectJavaScript(script);
+//     }
+//   };
 
-  // Handle HTTP errors
-  const handleHttpError = (syntheticEvent) => {
-    const { nativeEvent } = syntheticEvent;
-    Alert.alert(
-      "HTTP Error",
-      `The page failed to load (HTTP status code: ${nativeEvent.statusCode}).`
-    );
-  };
-  const isHomepage = url.endsWith("/home") || url.endsWith("/");
+//   const handleNavigationStateChange = (navState) => {
+//     const newUrl = navState.url;
+//     // Only update the URL if it has actually changed
+//     if (url !== newUrl) {
+//       updateUrl(newUrl);
+//       const isScannerPage = newUrl.includes("/cart/scanner");
+//       setCameraEnabled(isScannerPage);
+//     }
+//   };
+//   // Handle WebView load errors
+//   const handleWebViewError = (error) => {
+//     Alert.alert(
+//       "Load Error",
+//       "Failed to load the page. Please check the URL or your network connection."
+//     );
+//   };
 
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      {isHomepage && <BrowserHeader onUrlSubmit={updateUrl} currentUrl={url} />}
-      {cameraEnabled && <BarcodeScanner onScan={handleScanData} />}
-      <WebView
-        ref={webViewRef}
-        source={{ uri: url }} // Use the global URL
-        style={{ flex: 1 }}
-        javaScriptEnabled={true}
-        onNavigationStateChange={handleNavigationStateChange}
-        onError={handleWebViewError}
-        onHttpError={handleHttpError}
-      />
-    </SafeAreaView>
-  );
-};
+//   // Handle HTTP errors
+//   const handleHttpError = (syntheticEvent) => {
+//     const { nativeEvent } = syntheticEvent;
+//     Alert.alert(
+//       "HTTP Error",
+//       `The page failed to load (HTTP status code: ${nativeEvent.statusCode}).`
+//     );
+//   };
+//   const isHomepage = url.endsWith("/home") || url.endsWith("/");
 
-const styles = StyleSheet.create({
-  fab: {
-    position: "absolute",
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#007AFF",
-    bottom: 20,
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    shadowColor: "#000",
-    shadowOffset: { height: 3, width: 0 },
-    elevation: 6,
-  },
-  leftFab: {
-    left: 20,
-  },
-  rightFab: {
-    right: 20,
-  },
-});
+//   return (
+//     <SafeAreaView style={{ flex: 1 }}>
+//       <BrowserHeader onUrlSubmit={updateUrl} currentUrl={url} />
+//       {/* Show BarcodeScanner if cameraEnabled and continuous scanning is active */}
+//       {cameraEnabled && isContinuousScanning && (
+//         <BarcodeScanner onScan={handleScanData} />
+//       )}
+//       <WebView
+//         ref={webViewRef}
+//         source={{ uri: url }}
+//         style={{ flex: 1 }}
+//         javaScriptEnabled={true}
+//         onNavigationStateChange={handleNavigationStateChange}
+//         onError={handleWebViewError}
+//         onHttpError={handleHttpError}
+//       />
+//       {/* A visual indicator for the continuous scanning mode could be useful */}
+//       {isContinuousScanning && (
+//         <View style={styles.continuousScanningIndicator}>
+//           <Text>Continuous Scanning Mode</Text>
+//         </View>
+//       )}
+//     </SafeAreaView>
+//   );
+// };
 
-export default Scanner;
+// const styles = StyleSheet.create({
+//   continuousScanningIndicator: {
+//     position: "absolute",
+//     bottom: 0,
+//     left: 0,
+//     right: 0,
+//     backgroundColor: "rgba(0, 0, 0, 0.5)",
+//     padding: 10,
+//     justifyContent: "center",
+//     alignItems: "center",
+//   },
+//   // ... Other styles if necessary
+// });
+
+// export default ContinuousScanner;
