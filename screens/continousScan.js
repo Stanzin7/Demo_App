@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { Platform, Alert } from "react-native";
 import { SafeAreaView, StyleSheet, TouchableOpacity } from "react-native";
 import BarcodeScanner from "../components/BarcodeScanner";
 import BrowserHeader from "../components/BrowserHeader";
@@ -8,7 +9,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 const Scanner = () => {
   // const webViewRef = useRef(null);
-  const { url, updateUrl, webViewRef } = useNavigationContext(); // Use the global URL from the NavigationContext
+  const webViewRef = useRef(null);
+  const { url, updateUrl } = useNavigationContext(); // Use the global URL from the NavigationContext
   const [cameraEnabled, setCameraEnabled] = useState(false);
 
   // useEffect(() => {
@@ -21,17 +23,26 @@ const Scanner = () => {
 
     const script = `
     (function() {
-      var inputs = document.querySelectorAll("input[formControlName='search']");
-      var newData = '${newData}';
-      if(inputs.length > 0) {
-        var input = inputs[0];
-        input.value = newData;
-        input.dispatchEvent(new Event('input', { bubbles: true }));     
-        input.setAttribute('readonly', true);
+      var input = document.querySelector("input[formControlName='search']");
+      if (input) {
+        // Set the value of the input
+        input.value = '${newData}';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        
+        // Attempt to trigger the form submission
+        var form = input.closest('form');
+        if (form) {
+          form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+          // Blur the input field to hide the keyboard
+          input.blur();
+          return true;
+        }
       }
+      return false;
     })();
-    true; 
+    true;
   `;
+
     webViewRef.current?.injectJavaScript(script);
   };
 
@@ -44,7 +55,23 @@ const Scanner = () => {
       setCameraEnabled(isScannerPage);
     }
   };
-  const isHomepage = url.endsWith("/home");
+  // Handle WebView load errors
+  const handleWebViewError = (error) => {
+    Alert.alert(
+      "Load Error",
+      "Failed to load the page. Please check the URL or your network connection."
+    );
+  };
+
+  // Handle HTTP errors
+  const handleHttpError = (syntheticEvent) => {
+    const { nativeEvent } = syntheticEvent;
+    Alert.alert(
+      "HTTP Error",
+      `The page failed to load (HTTP status code: ${nativeEvent.statusCode}).`
+    );
+  };
+  const isHomepage = url.endsWith("/home") || url.endsWith("/");
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -56,19 +83,9 @@ const Scanner = () => {
         style={{ flex: 1 }}
         javaScriptEnabled={true}
         onNavigationStateChange={handleNavigationStateChange}
+        onError={handleWebViewError}
+        onHttpError={handleHttpError}
       />
-      {/* <TouchableOpacity
-        onPress={() => webViewRef.current?.goBack()}
-        style={[styles.fab, styles.leftFab]}
-      >
-        <MaterialIcons name="arrow-back" size={24} color="white" />
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => webViewRef.current?.goForward()}
-        style={[styles.fab, styles.rightFab]}
-      >
-        <MaterialIcons name="arrow-forward" size={24} color="white" />
-      </TouchableOpacity> */}
     </SafeAreaView>
   );
 };

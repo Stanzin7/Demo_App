@@ -1,72 +1,54 @@
-import React, { useState } from "react";
-import { Platform } from "react-native";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
-  KeyboardAvoidingView,
-} from "react-native";
-import { useNavigationContext } from "../context/NavigationContext";
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import BrowserHeader from "./BrowserHeader"; // Ensure this path is correct
+import { useNavigationContext } from "../context/NavigationContext"; // Adjust the path as necessary
 import { useNavigation } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const WelcomePage = () => {
-  const [userInputUrl, setUserInputUrl] = useState("");
-  const { updateUrl } = useNavigationContext();
   const navigation = useNavigation();
+  const { updateUrl } = useNavigationContext();
 
-  const handleURLSubmit = () => {
-    const formattedURL = userInputUrl.match(/^http[s]?:\/\//)
-      ? userInputUrl
-      : `https://${userInputUrl}`;
-
-    console.log("Submitting URL:", formattedURL);
-    updateUrl(formattedURL);
-    navigation.navigate("Tabs");
+  const handleUrlSubmit = (url) => {
+    console.log("URL submitted:", url);
+    updateUrl(url);
+    navigation.navigate("Tabs"); // Ensure "Tabs" is the correct name of the screen to navigate to
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <View style={styles.inner}>
-        <Text style={styles.text}>Welcome to our App</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={setUserInputUrl}
-          value={userInputUrl}
-          placeholder="Enter company URL"
-          keyboardType="url"
-        />
-        <Button title="Go" onPress={handleURLSubmit} />
+    <SafeAreaView style={styles.safeArea}>
+      {/* BrowserHeader is the first element inside the SafeAreaView */}
+      <BrowserHeader onUrlSubmit={handleUrlSubmit} currentUrl="" />
+      <View style={styles.content}>
+        <Text style={styles.text}>Welcome to IMX Scanner</Text>
+        <Text style={styles.subtext}>Please enter the URL:</Text>
       </View>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
+
+    paddingTop: 0,
+    margin: 0,
   },
-  inner: {
-    padding: 24,
+  content: {
     flex: 1,
     justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
   },
   text: {
     fontSize: 22,
-    marginBottom: 20,
     textAlign: "center",
+    marginBottom: 10,
   },
-  input: {
-    height: 40,
-    margin: 12,
-    borderWidth: 1,
-    padding: 10,
-    width: "80%",
-    alignSelf: "center",
+  subtext: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 20,
   },
 });
 

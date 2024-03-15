@@ -6,28 +6,28 @@ const NavigationContext = createContext();
 export const useNavigationContext = () => useContext(NavigationContext);
 
 export const NavigationProvider = ({ children }) => {
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState("https://www.google.com");
+  const [cameraEnabled, setCameraEnabled] = useState(false); // State to control camera
   const webViewRef = useRef(null);
 
   const updateUrl = (newUrl) => {
     setUrl(newUrl);
   };
 
-  const goBack = () => {
-    if (webViewRef.current) {
-      webViewRef.current.goBack();
-    }
-  };
-
-  const goForward = () => {
-    if (webViewRef.current) {
-      webViewRef.current.goForward();
-    }
-  };
+  const goBack = () => webViewRef.current?.goBack();
+  const goForward = () => webViewRef.current?.goForward();
 
   return (
     <NavigationContext.Provider
-      value={{ url, updateUrl, webViewRef, goBack, goForward }}
+      value={{
+        url,
+        updateUrl,
+        webViewRef,
+        goBack,
+        goForward,
+        cameraEnabled,
+        setCameraEnabled,
+      }}
     >
       {children}
     </NavigationContext.Provider>
