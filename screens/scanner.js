@@ -1,32 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { SafeAreaView, StyleSheet, Alert } from "react-native";
 import BarcodeScanner from "../components/BarcodeScanner"; // Adjust this path as necessary
 import WebView from "react-native-webview";
 import { useNavigationContext } from "../context/NavigationContext";
 import BrowserHeader from "../components/BrowserHeader";
+import { useCameraService } from "../services/cameraService";
 
 const Scanner = () => {
-  const { url, updateUrl, cameraEnabled, webViewRef } = useNavigationContext();
+  const { url, updateUrl, cameraEnabled, webViewRef, cameraDelay } =
+    useNavigationContext();
 
-  const { cameraDelay: contextCameraDelay } = useNavigationContext();
-  const cameraDelay =
-    contextCameraDelay !== undefined ? contextCameraDelay : 5000;
-
+  console.log("Current cameraDelay in scanner:", cameraDelay);
   const shouldShowHeader = (url) => {
-    // Parse the URL to get the hostname and pathname
     const parsedUrl = new URL(url);
     const hostname = parsedUrl.hostname;
     const pathname = parsedUrl.pathname;
 
-    // Check if the URL is on google.com, potentially with a search path or query
     const isGoogleSearch =
       hostname.includes("google.com") &&
       (pathname === "/search" || pathname === "/");
 
-    // Check if the pathname is '/home'
     const isHomePage = pathname === "/home";
 
-    // Show header if it's a Google search or the home page
     return isGoogleSearch || isHomePage;
   };
 
@@ -42,11 +37,11 @@ const Scanner = () => {
         if (form) {
           form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
         }
-        input.blur(); // This line is added to blur the input field and prevent the keyboard from showing
+        document.activeElement.blur(); // Attempt to blur any currently focused element
       }
     })();
     true;
-  `;
+    `;
     webViewRef.current?.injectJavaScript(script);
   };
 
@@ -62,7 +57,13 @@ const Scanner = () => {
       {shouldShowHeader(url) && (
         <BrowserHeader onUrlSubmit={updateUrl} currentUrl={url} />
       )}
-      {cameraEnabled && <BarcodeScanner onScan={handleScanData} />}
+      {cameraEnabled && (
+        <BarcodeScanner
+          onScan={handleScanData}
+          cameraDelay={cameraDelay}
+          // isScanningEnabled={isScanningEnabled}
+        />
+      )}
       <WebView
         ref={webViewRef}
         source={{ uri: url }}

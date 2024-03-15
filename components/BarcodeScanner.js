@@ -10,16 +10,14 @@ const BarcodeScanner = ({ onScan }) => {
   const handleBarcodeScanned = ({ type, data }) => {
     if (!isScanningEnabled || !data) return;
 
-    setIsScanningEnabled(false); // Disable scanning temporarily
-    onScan(data); // Send scanned data up to parent component for processing
+    setIsScanningEnabled(false);
+    onScan(data);
 
-    // Re-enable scanning after a short delay to prevent immediate re-triggering
     setTimeout(() => {
       setIsScanningEnabled(true);
-    }, 3000); // Adjust delay as needed
+    }, 4000);
   };
 
-  // Request camera permission on mount
   useEffect(() => {
     requestPermission();
   }, [requestPermission]);

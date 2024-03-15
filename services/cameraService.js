@@ -1,8 +1,9 @@
+// Rename CameraService to useCameraService to follow React hook naming convention
 import { useState, useEffect, useCallback } from "react";
 import { Alert } from "react-native";
 import { useCameraPermissions } from "expo-camera/next";
 
-const CameraService = ({ cameraDelay }) => {
+export const useCameraService = ({ cameraDelay = 3000 }) => {
   const [permissions, requestPermission] = useCameraPermissions();
   const [isScanningEnabled, setIsScanningEnabled] = useState(false);
 
@@ -17,37 +18,25 @@ const CameraService = ({ cameraDelay }) => {
           "Camera permission is required to scan barcodes."
         );
       }
+      console.log("CameraService here", cameraDelay);
     })();
-  }, [requestPermission]);
+  }, [requestPermission, cameraDelay]); // Add cameraDelay to useEffect dependencies if its value affects this effect
 
-  // Define a method to handle the barcode scanned event
   const handleBarcodeScanned = useCallback(
     ({ type, data }) => {
       if (!isScanningEnabled || !data) return;
 
-      // Immediately disable scanning to prevent duplicate scans
       setIsScanningEnabled(false);
-
-      // Show an alert or handle the scanned data
       Alert.alert("Barcode Scanned", `Type: ${type}, Data: ${data}`);
 
-      // Set a timeout to re-enable scanning after the user-defined delay
       const timer = setTimeout(() => {
         setIsScanningEnabled(true);
       }, cameraDelay);
 
-      // Cleanup function to clear the timer
       return () => clearTimeout(timer);
     },
     [cameraDelay, isScanningEnabled]
   );
 
-  // Return the camera permissions, scanning enabled state, and the scanning handler
-  return {
-    permissions,
-    isScanningEnabled,
-    handleBarcodeScanned,
-  };
+  return { permissions, isScanningEnabled, handleBarcodeScanned };
 };
-
-export default CameraService;

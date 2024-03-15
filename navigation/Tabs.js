@@ -11,22 +11,24 @@ import {
 import { useNavigationContext } from "../context/NavigationContext";
 import Scanner from "../screens/Scanner";
 import KeyPad from "../screens/KeyPad";
-import SetDelayModal from "../components/ModalComponent"; // Adjust the path as needed to correctly import SetDelayModal
+import SetDelayModal from "../components/ModalComponent";
 
 const Tab = createBottomTabNavigator();
 
 const Tabs = () => {
-  const { url, goBack, goForward, setCameraDelay } = useNavigationContext();
+  const { url, goBack, goForward, cameraDelay, setCameraDelay } =
+    useNavigationContext();
   const [isModalVisible, setModalVisible] = useState(false);
 
+  console.log(cameraDelay);
   //handle errors
-  const { cameraDelay: contextCameraDelay } = useNavigationContext();
-  const cameraDelay =
-    contextCameraDelay !== undefined ? contextCameraDelay : 5000;
+  // const { cameraDelay: contextCameraDelay } = useNavigationContext();
+  // const cameraDelay =
+  //   contextCameraDelay !== undefined ? contextCameraDelay : 3000;
 
-  useEffect(() => {
-    console.log("Component received updated cameraDelay:", cameraDelay);
-  }, [cameraDelay]);
+  // useEffect(() => {
+  //   console.log("Component received updated cameraDelay:", cameraDelay);
+  // }, []);
 
   const shouldShowTabBar = url.endsWith("/");
   const screenOptions = ({ route }) => ({
@@ -82,10 +84,10 @@ const Tabs = () => {
       </Tab.Navigator>
       <SetDelayModal
         isVisible={isModalVisible}
-        currentDelay={cameraDelay} // Ensure this reflects the actual current delay
+        currentDelay={cameraDelay}
         onClose={() => setModalVisible(false)}
         onSetDelay={(newDelay) => {
-          console.log("Updating context with new delay:", newDelay); // Add this line
+          console.log("Updating context with new delay:", newDelay);
           setCameraDelay(newDelay);
           setModalVisible(false);
         }}
