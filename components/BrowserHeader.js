@@ -4,9 +4,8 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  Image,
+  Text,
 } from "react-native";
-import { EvilIcons } from "@expo/vector-icons";
 
 const BrowserHeader = ({ onUrlSubmit, currentUrl }) => {
   const [inputValue, setInputValue] = useState(currentUrl);
@@ -48,7 +47,7 @@ const BrowserHeader = ({ onUrlSubmit, currentUrl }) => {
         autoCorrect={false}
       />
       <TouchableOpacity style={styles.goButton} onPress={handleSubmitEditing}>
-        <EvilIcons name="search" size={24} color="white" />
+        <Text style={styles.goText}>Go</Text>
       </TouchableOpacity>
     </View>
   );
@@ -78,9 +77,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#007AFF",
     borderRadius: 10,
   },
-  goImage: {
-    width: 16,
-    height: 16,
+  goText: {
+    color: "white",
+    fontSize: 17,
+    fontWeight: "bold",
   },
 });
 

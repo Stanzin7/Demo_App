@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Alert } from "react-native";
 import { useCameraPermissions } from "expo-camera/next";
 
-const CameraService = () => {
-  const [permission, requestPermission] = useCameraPermissions();
+const CameraService = ({ cameraDelay }) => {
+  const [permissions, requestPermission] = useCameraPermissions();
   const [isScanningEnabled, setIsScanningEnabled] = useState(false);
 
   useEffect(() => {
@@ -20,22 +20,31 @@ const CameraService = () => {
     })();
   }, [requestPermission]);
 
-  const handleBarcodeScanned = ({ type, data }) => {
-    if (!isScanningEnabled || !data) return;
-    setIsScanningEnabled(false);
-    Alert.alert("Barcode Scanned", `Type: ${type}, Data: ${data}`);
+  // Define a method to handle the barcode scanned event
+  const handleBarcodeScanned = useCallback(
+    ({ type, data }) => {
+      if (!isScanningEnabled || !data) return;
 
-    // Re-enable scanning after 3 seconds
-    const timer = setTimeout(() => {
-      setIsScanningEnabled(true);
-    }, 5000);
+      // Immediately disable scanning to prevent duplicate scans
+      setIsScanningEnabled(false);
 
-    // Cleanup function in useEffect hook
-    return () => clearTimeout(timer);
-  };
+      // Show an alert or handle the scanned data
+      Alert.alert("Barcode Scanned", `Type: ${type}, Data: ${data}`);
 
+      // Set a timeout to re-enable scanning after the user-defined delay
+      const timer = setTimeout(() => {
+        setIsScanningEnabled(true);
+      }, cameraDelay);
+
+      // Cleanup function to clear the timer
+      return () => clearTimeout(timer);
+    },
+    [cameraDelay, isScanningEnabled]
+  );
+
+  // Return the camera permissions, scanning enabled state, and the scanning handler
   return {
-    permission,
+    permissions,
     isScanningEnabled,
     handleBarcodeScanned,
   };

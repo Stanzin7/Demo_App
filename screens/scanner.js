@@ -8,6 +8,10 @@ import BrowserHeader from "../components/BrowserHeader";
 const Scanner = () => {
   const { url, updateUrl, cameraEnabled, webViewRef } = useNavigationContext();
 
+  const { cameraDelay: contextCameraDelay } = useNavigationContext();
+  const cameraDelay =
+    contextCameraDelay !== undefined ? contextCameraDelay : 5000;
+
   const shouldShowHeader = (url) => {
     // Parse the URL to get the hostname and pathname
     const parsedUrl = new URL(url);
