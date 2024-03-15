@@ -20,7 +20,7 @@ const Tabs = () => {
     useNavigationContext();
   const [isModalVisible, setModalVisible] = useState(false);
 
-  console.log(cameraDelay);
+  // console.log(cameraDelay);
   //handle errors
   // const { cameraDelay: contextCameraDelay } = useNavigationContext();
   // const cameraDelay =
@@ -58,7 +58,7 @@ const Tabs = () => {
     <>
       <Tab.Navigator screenOptions={screenOptions}>
         <Tab.Screen
-          name="Scanner"
+          name="Imx-Scanner"
           component={Scanner}
           options={{
             tabBarLabel: "Scan",
@@ -72,7 +72,7 @@ const Tabs = () => {
           }}
         />
         <Tab.Screen
-          name="KeyPad"
+          name="Imx-Keypad"
           component={KeyPad}
           options={{
             tabBarLabel: "KeyPad",
@@ -87,7 +87,7 @@ const Tabs = () => {
         currentDelay={cameraDelay}
         onClose={() => setModalVisible(false)}
         onSetDelay={(newDelay) => {
-          console.log("Updating context with new delay:", newDelay);
+          // console.log("Updating context with new delay:", newDelay);
           setCameraDelay(newDelay);
           setModalVisible(false);
         }}

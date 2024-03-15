@@ -22,9 +22,9 @@ export const NavigationProvider = ({ children }) => {
     setCameraEnabled(enableCameraForScanPage);
   }, [url]);
 
-  useEffect(() => {
-    console.log("Initial cameraDelay in context:", cameraDelay);
-  }, []);
+  // useEffect(() => {
+  //   console.log("Initial cameraDelay in context:", cameraDelay);
+  // }, []);
 
   const updateUrl = (newUrl) => {
     setUrl(newUrl);

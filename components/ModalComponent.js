@@ -20,7 +20,7 @@ const SetDelayModal = ({ isVisible, currentDelay, onClose, onSetDelay }) => {
     if (!isNaN(delayInSeconds) && delayInSeconds > 0) {
       // Convert delay back to milliseconds before setting
       const delayInMilliseconds = delayInSeconds * 1000;
-      console.log("Setting delay to:", delayInSeconds, "seconds"); // Updated log message
+      // console.log("Setting delay to:", delayInSeconds, "seconds"); // Updated log message
       onSetDelay(delayInMilliseconds);
       onClose(); // Close the modal
     } else {

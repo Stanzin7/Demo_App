@@ -18,7 +18,7 @@ export const useCameraService = ({ cameraDelay = 3000 }) => {
           "Camera permission is required to scan barcodes."
         );
       }
-      console.log("CameraService here", cameraDelay);
+      // console.log("CameraService here", cameraDelay);
     })();
   }, [requestPermission, cameraDelay]); // Add cameraDelay to useEffect dependencies if its value affects this effect
 
