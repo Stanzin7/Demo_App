@@ -7,6 +7,7 @@ import {
   MaterialCommunityIcons,
   Ionicons,
   MaterialIcons,
+  Entypo,
 } from "@expo/vector-icons";
 import { useNavigationContext } from "../context/NavigationContext";
 
@@ -16,8 +17,8 @@ const Tabs = () => {
   const { url, goBack, goForward } = useNavigationContext();
 
   const generateScannerUrl = () => {
-    const baseUrl = url.substring(0, url.indexOf("/", 8)); // Get base URL until /
-    return `${baseUrl}/cart/scanner`; // Append /cart/scanner to the base URL
+    const baseUrl = url.substring(0, url.indexOf("/", 8));
+    return `${baseUrl}/cart/scanner`;
   };
 
   const screenOptions = ({ route }) => ({

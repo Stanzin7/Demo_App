@@ -17,7 +17,6 @@ const BrowserHeader = ({ onUrlSubmit, currentUrl }) => {
 
   const handleSubmitEditing = () => {
     if (inputValue) {
-      // Check if the URL starts with 'http://' or 'https://', if not, prepend 'https://'
       let formattedInputValue = /^(http|https):\/\//.test(inputValue)
         ? inputValue
         : `https://${inputValue}`;

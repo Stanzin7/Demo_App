@@ -28,7 +28,7 @@ const CameraService = () => {
     // Re-enable scanning after 3 seconds
     const timer = setTimeout(() => {
       setIsScanningEnabled(true);
-    }, 3000);
+    }, 5000);
 
     // Cleanup function in useEffect hook
     return () => clearTimeout(timer);

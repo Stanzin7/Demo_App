@@ -8,7 +8,7 @@ const KeyPad = () => {
   const { url, updateUrl, webViewRef, setCameraEnabled } =
     useNavigationContext();
   useEffect(() => {
-    setCameraEnabled(false); // This will turn off the camera when the KeyPad is active
+    setCameraEnabled(false);
   }, [setCameraEnabled]);
   return (
     <SafeAreaView style={styles.container}>
