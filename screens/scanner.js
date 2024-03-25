@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet, Alert } from "react-native";
 import BarcodeScanner from "../components/BarcodeScanner"; // Adjust this path as necessary
 import WebView from "react-native-webview";
@@ -9,6 +9,7 @@ import { useCameraService } from "../services/cameraService";
 const Scanner = () => {
   const { url, updateUrl, cameraEnabled, webViewRef, cameraDelay } =
     useNavigationContext();
+  const [cameraKey, setCameraKey] = useState(0);
 
   console.log("Current cameraDelay in scanner:", cameraDelay);
   const shouldShowHeader = (url) => {
@@ -43,6 +44,7 @@ const Scanner = () => {
     true;
     `;
     webViewRef.current?.injectJavaScript(script);
+    setCameraKey((prevKey) => prevKey + 1);
   };
 
   // Monitor the navigation state to update the URL accordingly

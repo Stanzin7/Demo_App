@@ -1,6 +1,5 @@
-// Rename CameraService to useCameraService to follow React hook naming convention
 import { useState, useEffect, useCallback } from "react";
-import { Alert } from "react-native";
+import { Alert, Linking } from "react-native";
 import { useCameraPermissions } from "expo-camera/next";
 
 export const useCameraService = ({ cameraDelay = 3000 }) => {
@@ -9,18 +8,28 @@ export const useCameraService = ({ cameraDelay = 3000 }) => {
 
   useEffect(() => {
     (async () => {
-      const { status } = await requestPermission();
-      if (status === "granted") {
-        setIsScanningEnabled(true); // Enable scanning only if permissions are granted
-      } else {
-        Alert.alert(
-          "Camera Permission",
-          "Camera permission is required to scan barcodes."
-        );
+      // Automatically request permission if it hasn't been requested yet
+      if (permissions.status === "undetermined") {
+        await requestPermission();
       }
-      // console.log("CameraService here", cameraDelay);
     })();
-  }, [requestPermission, cameraDelay]); // Add cameraDelay to useEffect dependencies if its value affects this effect
+  }, [permissions.status, requestPermission]);
+
+  useEffect(() => {
+    if (permissions.status === "granted") {
+      setIsScanningEnabled(true); // Enable scanning only if permissions are granted
+    } else if (permissions.status === "denied") {
+      // Alert the user if permissions are denied
+      Alert.alert(
+        "Camera Permission",
+        "Camera permission is required to scan barcodes. Please enable it in the Settings.",
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Open Settings", onPress: () => Linking.openSettings() }, // Direct the user to the settings
+        ]
+      );
+    }
+  }, [permissions.status]); // Depend on permissions.status to re-check whenever it changes
 
   const handleBarcodeScanned = useCallback(
     ({ type, data }) => {
@@ -29,11 +38,9 @@ export const useCameraService = ({ cameraDelay = 3000 }) => {
       setIsScanningEnabled(false);
       Alert.alert("Barcode Scanned", `Type: ${type}, Data: ${data}`);
 
-      const timer = setTimeout(() => {
+      setTimeout(() => {
         setIsScanningEnabled(true);
       }, cameraDelay);
-
-      return () => clearTimeout(timer);
     },
     [cameraDelay, isScanningEnabled]
   );

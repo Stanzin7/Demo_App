@@ -9,8 +9,8 @@ import {
   Entypo,
 } from "@expo/vector-icons";
 import { useNavigationContext } from "../context/NavigationContext";
-import Scanner from "../screens/Scanner";
-import KeyPad from "../screens/KeyPad";
+import Scanner from "../screens/scanner";
+import KeyPad from "../screens/keyPad";
 import SetDelayModal from "../components/ModalComponent";
 
 const Tab = createBottomTabNavigator();
