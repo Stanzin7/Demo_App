@@ -1,7 +1,8 @@
 {
   "expo": {
     "name": "Demo",
-    "slug": "DemoAppUniqueSlug",
+    "slug": "DemoAppUniqueSlug200",
+    "runtimeVersion": "1.0.0",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -11,9 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -30,7 +29,7 @@
       "package": "com.stanzin7.DemoAppUniqueSlug"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
       [
@@ -44,7 +43,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "ab5607af-06a4-4879-8fa4-cbf36960af4d"
+        "projectId": "0107fa47-7b0e-4252-b805-a1cb785ef74c"
       }
     }
   }

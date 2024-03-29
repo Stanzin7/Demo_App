@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Alert, Linking } from "react-native";
 import { useCameraPermissions } from "expo-camera/next";
 
-export const useCameraService = ({ cameraDelay = 3000 }) => {
+export const useCameraService = () => {
   const [permissions, requestPermission] = useCameraPermissions();
   const [isScanningEnabled, setIsScanningEnabled] = useState(false);
 
@@ -30,20 +30,32 @@ export const useCameraService = ({ cameraDelay = 3000 }) => {
       );
     }
   }, [permissions.status]); // Depend on permissions.status to re-check whenever it changes
-
+  const toggleScanning = useCallback(() => {
+    if (permissions.status === "granted") {
+      setIsScanningEnabled(!isScanningEnabled);
+    } else {
+      // Alert the user if permissions are not granted
+      Alert.alert(
+        "Camera Permission Required",
+        "You need to grant camera permissions to use this feature.",
+        [{ text: "OK", onPress: requestPermission }]
+      );
+    }
+  }, [permissions.status, isScanningEnabled, requestPermission]);
   const handleBarcodeScanned = useCallback(
     ({ type, data }) => {
       if (!isScanningEnabled || !data) return;
 
       setIsScanningEnabled(false);
       Alert.alert("Barcode Scanned", `Type: ${type}, Data: ${data}`);
-
-      setTimeout(() => {
-        setIsScanningEnabled(true);
-      }, cameraDelay);
     },
-    [cameraDelay, isScanningEnabled]
+    [isScanningEnabled]
   );
 
-  return { permissions, isScanningEnabled, handleBarcodeScanned };
+  return {
+    permissions,
+    isScanningEnabled,
+    handleBarcodeScanned,
+    toggleScanning,
+  };
 };

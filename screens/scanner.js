@@ -1,53 +1,53 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, StyleSheet, Alert } from "react-native";
-import BarcodeScanner from "../components/BarcodeScanner"; // Adjust this path as necessary
+import { SafeAreaView, StyleSheet, View, Button } from "react-native";
+import BarcodeScanner from "../components/BarcodeScanner"; // Make sure the path matches your project structure
 import WebView from "react-native-webview";
-import { useNavigationContext } from "../context/NavigationContext";
-import BrowserHeader from "../components/BrowserHeader";
-import { useCameraService } from "../services/cameraService";
+import { useNavigationContext } from "../context/NavigationContext"; // Adjust path as needed
+import BrowserHeader from "../components/BrowserHeader"; // Adjust path as needed
 
 const Scanner = () => {
-  const { url, updateUrl, cameraEnabled, webViewRef, cameraDelay } =
+  const { url, updateUrl, cameraEnabled, setCameraEnabled, webViewRef } =
     useNavigationContext();
-  const [cameraKey, setCameraKey] = useState(0);
+  const [webViewKey, setWebViewKey] = useState(0);
+  const [hasScannedOnce, setHasScannedOnce] = useState(false);
 
-  console.log("Current cameraDelay in scanner:", cameraDelay);
+  useEffect(() => {
+    if (url.includes("/cart/scanner")) {
+      setHasScannedOnce(true);
+    }
+  }, [url]);
+
   const shouldShowHeader = (url) => {
     const parsedUrl = new URL(url);
     const hostname = parsedUrl.hostname;
     const pathname = parsedUrl.pathname;
 
-    const isGoogleSearch =
+    return (
       hostname.includes("google.com") &&
-      (pathname === "/search" || pathname === "/");
-
-    const isHomePage = pathname === "/home";
-
-    return isGoogleSearch || isHomePage;
+      (pathname === "/search" || pathname === "/")
+    );
   };
 
   const handleScanData = (data) => {
     let newData = data.startsWith("0") ? data.substring(1) : data;
     const script = `
-    (function() {
-      var input = document.querySelector("input[formControlName='search']");
-      if (input) {
-        input.value = '${newData}';
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        var form = input.closest('form');
-        if (form) {
-          form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      (function() {
+        var input = document.querySelector("input[formControlName='search']");
+        if (input) {
+          input.value = '${newData}';
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          var form = input.closest('form');
+          if (form) {
+            form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+          }
+          document.activeElement.blur();
         }
-        document.activeElement.blur(); // Attempt to blur any currently focused element
-      }
-    })();
-    true;
+      })();
+      true;
     `;
     webViewRef.current?.injectJavaScript(script);
-    setCameraKey((prevKey) => prevKey + 1);
   };
 
-  // Monitor the navigation state to update the URL accordingly
   const handleNavigationStateChange = (navState) => {
     if (url !== navState.url) {
       updateUrl(navState.url);
@@ -62,20 +62,31 @@ const Scanner = () => {
       {cameraEnabled && (
         <BarcodeScanner
           onScan={handleScanData}
-          cameraDelay={cameraDelay}
-          // isScanningEnabled={isScanningEnabled}
+          isScanningEnabled={cameraEnabled}
+          toggleScanning={() => setCameraEnabled(!cameraEnabled)}
         />
       )}
-      <WebView
-        ref={webViewRef}
-        source={{ uri: url }}
-        style={styles.webView}
-        onNavigationStateChange={handleNavigationStateChange}
-        onError={(syntheticEvent) => {
-          const { nativeEvent } = syntheticEvent;
-          Alert.alert("WebView error", nativeEvent.description);
-        }}
-      />
+      <View style={styles.webViewContainer}>
+        <WebView
+          key={webViewKey}
+          ref={webViewRef}
+          source={{ uri: url }}
+          style={styles.webView}
+          onNavigationStateChange={handleNavigationStateChange}
+        />
+        {hasScannedOnce && url.includes("/cart/scanner") && (
+          <View style={styles.scanAgainButton}>
+            <Button
+              title="Scan"
+              onPress={() => {
+                setCameraEnabled(true);
+                setHasScannedOnce(true); // This might be redundant if already set
+              }}
+              color="black"
+            />
+          </View>
+        )}
+      </View>
     </SafeAreaView>
   );
 };
@@ -84,8 +95,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  webViewContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
   webView: {
     flex: 1,
+  },
+  scanAgainButton: {
+    width: "90%",
+    position: "absolute",
+    backgroundColor: "orange",
+    color: "green",
+    bottom: 10,
+    alignSelf: "center",
+    borderRadius: 5,
+    fontWeight: "bold",
   },
 });
 
