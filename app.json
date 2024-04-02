@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "Demo",
-    "slug": "DemoAppUniqueSlug200",
+    "name": "IMXWebApp",
+    "slug": "IMXWebAppAppUniqueSlug700",
     "runtimeVersion": "1.0.0",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "light",
@@ -43,7 +43,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "0107fa47-7b0e-4252-b805-a1cb785ef74c"
+        "projectId": "68795ce7-ddb6-429f-9d7c-550c3c7ddd83"
       }
     }
   }

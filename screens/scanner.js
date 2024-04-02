@@ -44,6 +44,12 @@ const Scanner = () => {
         }
       })();
       true;
+
+      // After processing, disable the camera
+      setCameraEnabled(false);
+    
+      // Optionally, set a flag indicating the scan was processed, if needed
+      setHasScannedOnce(true);
     `;
     webViewRef.current?.injectJavaScript(script);
   };
@@ -80,7 +86,7 @@ const Scanner = () => {
               title="Scan"
               onPress={() => {
                 setCameraEnabled(true);
-                setHasScannedOnce(true); // This might be redundant if already set
+                // setHasScannedOnce(true); // This might be redundant if already set
               }}
               color="black"
             />

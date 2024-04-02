@@ -9,8 +9,13 @@ import {
 } from "./context/NavigationContext";
 import { MaterialIcons, SimpleLineIcons } from "@expo/vector-icons";
 import ScannerScreen from "./screens/scanner";
+import "react-native-gesture-handler";
 // import KeyPadScreen from "./screens/keyPad";
 
+// <- MB      --- -> //
+
+// <-[PLEASE ENTER URL][Go] -> //
+// remember website [---]
 const Stack = createStackNavigator();
 
 const BackButton = () => {
