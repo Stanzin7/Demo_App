@@ -6,29 +6,50 @@ import {
   TouchableOpacity,
   Text,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const BrowserHeader = ({ onUrlSubmit, currentUrl }) => {
   const [inputValue, setInputValue] = useState(currentUrl);
 
+  // Load the last entered URL from AsyncStorage when the component mounts
   useEffect(() => {
-    setInputValue(currentUrl);
+    const loadLastUrl = async () => {
+      try {
+        const lastUrl = await AsyncStorage.getItem("lastUrl");
+        if (lastUrl) {
+          setInputValue(lastUrl);
+          console.log("URL loaded:", lastUrl); // Moved inside the try block
+        }
+      } catch (error) {
+        console.error("Error loading the URL from AsyncStorage:", error);
+      }
+    };
+
+    loadLastUrl();
   }, []);
 
-  const handleSubmitEditing = () => {
+  const handleSubmitEditing = async () => {
     if (inputValue) {
-      let formattedInputValue = /^(http|https):\/\//.test(inputValue)
-        ? inputValue
-        : `https://${inputValue}`;
+      try {
+        let formattedInputValue = /^(http|https):\/\//.test(inputValue)
+          ? inputValue
+          : `https://${inputValue}`;
+        // Attempt to create a URL object to validate the URL
+        const urlObject = new URL(formattedInputValue);
+        if (urlObject.pathname === "/") {
+          urlObject.pathname = "/home";
+          formattedInputValue = urlObject.toString();
+        }
+        console.log("URL saved:", formattedInputValue);
 
-      // Normalize the URL to ensure it always goes to the homepage by checking if a path is present
-      const urlObject = new URL(formattedInputValue);
-      if (urlObject.pathname === "/") {
-        // If there is no path, set it to '/home'
-        urlObject.pathname = "/home";
-        formattedInputValue = urlObject.toString();
+        // If successful, submit the URL and save it
+        onUrlSubmit(formattedInputValue);
+        await AsyncStorage.setItem("lastUrl", formattedInputValue);
+      } catch (error) {
+        // Handle invalid URL error, e.g., show an alert or log
+        console.error("Invalid URL:", error.message);
+        // Optionally, inform the user the URL is invalid
       }
-
-      onUrlSubmit(formattedInputValue);
     }
   };
 

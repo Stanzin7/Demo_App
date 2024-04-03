@@ -5,7 +5,7 @@ const NavigationContext = createContext();
 export const useNavigationContext = () => useContext(NavigationContext);
 
 export const NavigationProvider = ({ children }) => {
-  const [url, setUrl] = useState("https://www.google.com"); // Set your default URL
+  const [url, setUrl] = useState(""); // Set your default URL
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const webViewRef = useRef(null);
 

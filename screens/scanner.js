@@ -62,9 +62,7 @@ const Scanner = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {shouldShowHeader(url) && (
-        <BrowserHeader onUrlSubmit={updateUrl} currentUrl={url} />
-      )}
+      <BrowserHeader onUrlSubmit={updateUrl} currentUrl={url} />
       {cameraEnabled && (
         <BarcodeScanner
           onScan={handleScanData}
@@ -72,27 +70,29 @@ const Scanner = () => {
           toggleScanning={() => setCameraEnabled(!cameraEnabled)}
         />
       )}
-      <View style={styles.webViewContainer}>
-        <WebView
-          key={webViewKey}
-          ref={webViewRef}
-          source={{ uri: url }}
-          style={styles.webView}
-          onNavigationStateChange={handleNavigationStateChange}
-        />
-        {hasScannedOnce && url.includes("/cart/scanner") && (
-          <View style={styles.scanAgainButton}>
-            <Button
-              title="Scan"
-              onPress={() => {
-                setCameraEnabled(true);
-                // setHasScannedOnce(true); // This might be redundant if already set
-              }}
-              color="black"
-            />
-          </View>
-        )}
-      </View>
+      {url && (
+        <View style={styles.webViewContainer}>
+          <WebView
+            key={webViewKey}
+            ref={webViewRef}
+            source={{ uri: url }}
+            style={styles.webView}
+            onNavigationStateChange={handleNavigationStateChange}
+          />
+          {hasScannedOnce && url.includes("/cart/scanner") && (
+            <View style={styles.scanAgainButton}>
+              <Button
+                title="Scan"
+                onPress={() => {
+                  setCameraEnabled(true);
+                  // Reactivate scanner as necessary
+                }}
+                color="black"
+              />
+            </View>
+          )}
+        </View>
+      )}
     </SafeAreaView>
   );
 };

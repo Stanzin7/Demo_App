@@ -36,11 +36,11 @@ const ForwardButton = () => {
   );
 };
 
-const MenuButton = ({ onMenuPress }) => (
-  <TouchableOpacity onPress={onMenuPress} style={styles.menuButton}>
-    <SimpleLineIcons name="options" size={24} color="white" />
-  </TouchableOpacity>
-);
+// const MenuButton = ({ onMenuPress }) => (
+//   <TouchableOpacity onPress={onMenuPress} style={styles.menuButton}>
+//     <SimpleLineIcons name="options" size={24} color="white" />
+//   </TouchableOpacity>
+// );
 
 function App() {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -52,7 +52,7 @@ function App() {
     headerTitle: "MB",
     headerRight: () => (
       <View style={styles.headerRightContainer}>
-        <MenuButton onMenuPress={() => setModalVisible(!isModalVisible)} />
+        {/* <MenuButton onMenuPress={() => setModalVisible(!isModalVisible)} /> */}
         <ForwardButton />
       </View>
     ),
