@@ -12,10 +12,6 @@ const BarcodeScanner = ({ onScan }) => {
 
     setIsScanningEnabled(false);
     onScan(data);
-
-    // setTimeout(() => {
-    //   setIsScanningEnabled(true);
-    // }, 4000);
   };
 
   useEffect(() => {

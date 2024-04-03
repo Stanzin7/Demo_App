@@ -17,6 +17,13 @@ const Scanner = () => {
     }
   }, [url]);
 
+  useEffect(() => {
+    // This effect ensures the camera is turned off when navigating away from /cart/scanner
+    if (!url.includes("/cart/scanner") && cameraEnabled) {
+      setCameraEnabled(false);
+    }
+  }, [url, cameraEnabled, setCameraEnabled]);
+
   const shouldShowHeader = (url) => {
     const parsedUrl = new URL(url);
     const hostname = parsedUrl.hostname;
